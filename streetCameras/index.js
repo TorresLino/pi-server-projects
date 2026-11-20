@@ -18,7 +18,7 @@ const DB_PATH = process.env.DB_PATH
   : path.join(__dirname, 'cameras.db');
 const TEMPLATE_PATH = process.env.TEMPLATE_PATH
   ? path.resolve(process.env.TEMPLATE_PATH)
-  : path.join(__dirname, 'views', 'dashboard.hbs');
+  : path.join(__dirname, 'dashboard.hbs');
 const MEMORY_THRESHOLD_BYTES =
   parseInt(process.env.MEMORY_THRESHOLD_BYTES, 10) || 1024 * 1024 * 1024;
 const FPS = parseInt(process.env.FPS, 10) || 25;
@@ -247,7 +247,7 @@ async function fetchAndBuffer(state) {
   }
 }
 
-export function syncWorkersFromDb() {
+function syncWorkersFromDb() {
   const rows = db.prepare('SELECT id, url, enabled FROM cameras ORDER BY created_at ASC, id ASC').all();
   const activeIds = new Set(rows.map((r) => r.id));
 
@@ -265,7 +265,7 @@ export function syncWorkersFromDb() {
   return rows;
 }
 
-export function restartWorkersFromDb() {
+function restartWorkersFromDb() {
   for (const state of workers.values()) {
     stopWorkerTimer(state);
   }
