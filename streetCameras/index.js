@@ -23,7 +23,7 @@ const MEMORY_THRESHOLD_BYTES =
   parseInt(process.env.MEMORY_THRESHOLD_BYTES, 10) || 1024 * 1024 * 1024
 const FPS = parseInt(process.env.FPS, 10) || 25
 const JITTER_MIN_MS = parseInt(process.env.JITTER_MIN_MS, 10) || 2000
-const JITTER_MAX_MS = parseInt(process.env.JITTER_MAX_MS, 10) || 18000
+const JITTER_MAX_MS = parseInt(process.env.JITTER_MAX_MS, 10) || 40000
 
 fs.mkdirSync(OUTPUT_DIR, { recursive: true })
 fs.mkdirSync(path.dirname(DB_PATH), { recursive: true })
@@ -98,7 +98,7 @@ function getLocalDateString(date = new Date()) {
   return `${year}-${month}-${day}`
 }
 
-export function compileVideo(camId, camDir, framesToEncode, customLabel = null) {
+function compileVideo(camId, camDir, framesToEncode, customLabel = null) {
   return new Promise((resolve) => {
     if (!framesToEncode || framesToEncode.length === 0) {
       return resolve(null)
@@ -158,7 +158,7 @@ function stopWorkerTimer(state) {
   }
 }
 
-export function createCameraWorker(cam) {
+function createCameraWorker(cam) {
   const existing = workers.get(cam.id)
   if (existing) {
     existing.url = cam.url
@@ -282,7 +282,7 @@ async function fetchAndBuffer(state) {
   }
 }
 
-export function syncWorkersFromDb() {
+function syncWorkersFromDb() {
   const rows = db.prepare('SELECT id, url, enabled FROM cameras ORDER BY created_at ASC, id ASC').all()
   const activeIds = new Set(rows.map((r) => r.id))
 
@@ -300,7 +300,7 @@ export function syncWorkersFromDb() {
   return rows
 }
 
-export function restartWorkersFromDb() {
+function restartWorkersFromDb() {
   for (const state of workers.values()) {
     stopWorkerTimer(state)
   }
@@ -524,5 +524,3 @@ async function handleShutdown(signal) {
 
 process.on('SIGINT', () => handleShutdown('SIGINT'))
 process.on('SIGTERM', () => handleShutdown('SIGTERM'))
-
-export { app, db, workers, syncWorkersFromDb, restartWorkersFromDb }
